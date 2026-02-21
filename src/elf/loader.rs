@@ -9,31 +9,28 @@ pub struct ElfLoader;
 
 impl ElfLoader {
     pub fn load_and_execute(file: &[u8], syscalls: &mut dyn Syscalls) -> Result<(), &'static str> {
-        // Obtener header
         let ehdr = Elf32_Ehdr::from_bytes(file).ok_or("Archivo demasiado pequeño")?;
-        
-        // Validar ELF
+    
         if !ehdr.is_valid() {
             return Err("No es un archivo ELF válido");
         }
-        
-        // Verificar clase (32 bits)
-        if ehdr.e_ident[4] != super::types::ELFCLASS32 {
-            return Err("Solo se soportan ELF32");
-        }
-        
-        // Cargar segmentos
+    
+        // Mostrar info de debug
+        crate::println!("ELF: entry point = 0x{:x}", ehdr.e_entry);
+        crate::println!("ELF: {} program headers", ehdr.e_phnum);
+    
         Self::load_segments(file, ehdr)?;
-        
-        // Ejecutar punto de entrada
-        let entry_fn: extern "C" fn(&mut dyn Syscalls) = unsafe {
-            core::mem::transmute(ehdr.e_entry as usize)
-        };
-        
+    
+        // IMPORTANTE: Asegurar que la firma de la función coincide
+        type EntryFn = extern "C" fn(&mut dyn Syscalls);
+        let entry_fn: EntryFn = unsafe { core::mem::transmute(ehdr.e_entry as usize) };
+    
+        crate::println!("Ejecutando punto de entrada...");
         entry_fn(syscalls);
+    
         Ok(())
     }
-    
+
     fn load_segments(file: &[u8], ehdr: &Elf32_Ehdr) -> Result<(), &'static str> {
         let phoff = ehdr.e_phoff as usize;
         let phentsize = ehdr.e_phentsize as usize;
