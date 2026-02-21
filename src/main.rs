@@ -30,42 +30,28 @@ static _END_MARKER: u64 = 0;
 
 #[no_mangle]
 extern "C" fn _start() -> ! {
-    // 1. Obtener framebuffer
+    // Get framebuffer
     let fb_response = match FRAMEBUFFER_REQUEST.get_response() {
         Some(response) => response,
         None => loop { x86_64::instructions::hlt(); }
     };
 
-    // 2. Crear framebuffer
+    // Create frambuffer
     let fb = match unsafe { Framebuffer::new_from_limine(fb_response) } {
         Some(fb) => fb,
         None => loop { x86_64::instructions::hlt(); }
     };
 
-    // 3. Guardar en WRITER global
+    // Save in global WRITER
     *WRITER.lock() = Some(fb);
 
-    // 4. Inicializar teclado
+    // Init keyboard
     keyboard::init();
 
-    // 5. Mensaje de bienvenida
-    println!("========================================");
-    println!("   DUCKOS - Teclado por POLLING!       ");
-    println!("========================================");
-    println!("");
-    println!("Presiona teclas (sin interrupciones):");
-    println!("");
-    print!("{}", INPUT_PROMPT);
+    println!("DuckOS v0.1.0");
 
-    // 6. Bucle principal con polling del teclado
     loop {
-        // Comprobar teclado continuamente
-        keyboard::poll_keyboard();
-
-        // Pequeña pausa para no saturar la CPU
-        for _ in 0..100000 {
-            core::hint::spin_loop();
-        }
+        x86_64::instructions::hlt();
     }
 }
 
