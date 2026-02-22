@@ -6,9 +6,9 @@ const SYS_EXIT: u64 = 60;
 
 #[no_mangle]
 pub unsafe extern "C" fn _start() -> ! {
-    let msg = b"Hola desde DuckOS!\n";
+    let msg = b"Hola desde ELF64!\n";
     
-    // Syscall write
+    // Write syscall
     core::arch::asm!(
         "syscall",
         in("rax") SYS_WRITE,
@@ -20,7 +20,7 @@ pub unsafe extern "C" fn _start() -> ! {
         options(nostack)
     );
     
-    // Syscall exit
+    // Exit syscall
     core::arch::asm!(
         "syscall",
         in("rax") SYS_EXIT,

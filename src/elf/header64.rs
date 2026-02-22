@@ -1,0 +1,50 @@
+// src/elf/header64.rs
+use core::mem;
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Elf64_Ehdr {
+    pub e_ident: [u8; 16],
+    pub e_type: u16,
+    pub e_machine: u16,
+    pub e_version: u32,
+    pub e_entry: u64,
+    pub e_phoff: u64,
+    pub e_shoff: u64,
+    pub e_flags: u32,
+    pub e_ehsize: u16,
+    pub e_phentsize: u16,
+    pub e_phnum: u16,
+    pub e_shentsize: u16,
+    pub e_shnum: u16,
+    pub e_shstrndx: u16,
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct Elf64_Phdr {
+    pub p_type: u32,
+    pub p_flags: u32,
+    pub p_offset: u64,
+    pub p_vaddr: u64,
+    pub p_paddr: u64,
+    pub p_filesz: u64,
+    pub p_memsz: u64,
+    pub p_align: u64,
+}
+
+impl Elf64_Ehdr {
+    pub fn from_bytes(bytes: &[u8]) -> Option<&Self> {
+        if bytes.len() < mem::size_of::<Self>() {
+            return None;
+        }
+        Some(unsafe { &*(bytes.as_ptr() as *const Self) })
+    }
+    
+    pub fn is_valid(&self) -> bool {
+        self.e_ident[0] == 0x7F &&
+        self.e_ident[1] == b'E' &&
+        self.e_ident[2] == b'L' &&
+        self.e_ident[3] == b'F'
+    }
+}

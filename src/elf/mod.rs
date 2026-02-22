@@ -1,7 +1,6 @@
-mod header;
-mod loader;
+// src/elf/mod.rs
+mod header64;
+mod loader64;
 mod types;
 
-pub use header::*;
-pub use loader::ElfLoader;
-pub use types::*;
+pub use loader64::ElfLoader;
