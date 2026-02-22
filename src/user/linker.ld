@@ -4,22 +4,9 @@ ENTRY(_start)
 
 SECTIONS
 {
-    . = 0x400000;  # Dirección base para programas 64 bits
-    
-    .text : {
-        *(.text .text.*)
-    }
-    
-    .rodata : {
-        *(.rodata .rodata.*)
-    }
-    
-    .data : {
-        *(.data .data.*)
-    }
-    
-    .bss : {
-        *(.bss .bss.*)
-    }
+    . = 0x8000000;  # 128 MB
+    .text : { *(.text .text.*) }
+    .rodata : { *(.rodata .rodata.*) }
+    .data : { *(.data .data.*) }
+    .bss : { *(.bss .bss.*) }
 }
-

@@ -1,5 +1,4 @@
-//! Estructuras de cabecera ELF32
-
+// src/elf/header.rs
 use core::mem;
 
 #[repr(C)]
@@ -43,9 +42,9 @@ impl Elf32_Ehdr {
     }
     
     pub fn is_valid(&self) -> bool {
-        self.e_ident[0] == super::types::ELFMAG0 &&
-        self.e_ident[1] == super::types::ELFMAG1 &&
-        self.e_ident[2] == super::types::ELFMAG2 &&
-        self.e_ident[3] == super::types::ELFMAG3
+        self.e_ident[0] == 0x7F &&
+        self.e_ident[1] == b'E' &&
+        self.e_ident[2] == b'L' &&
+        self.e_ident[3] == b'F'
     }
 }
